@@ -39,4 +39,4 @@ while main_loop:
 
 
     pygame.display.flip() #updates the screen
-    clock.tick(60)        #sets framerate 
+    clock.tick(60)        #sets the framerate 
