@@ -14,7 +14,14 @@ def slots():
     new_screen_height = slot_machine.get_height() 
     screen_slots = pygame.display.set_mode((new_screen_width, new_screen_height))
     screen_slots.blit(slot_machine)
-    pass
+    symbol_list = ["Seven.png","Melon.png","Diamond.png"]
+    symbols = []
+    for i in range(3):
+        symbols.append(pygame.image.load("Assets\Slot Symbols\\" + symbol_list[random.randint(0,2)]))
+        print(symbols)
+    screen_slots.blits
+    
+
 
 
 
@@ -27,7 +34,6 @@ def game_current(game_current):
     
 
 while main_loop:
-    
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             main_loop = False
