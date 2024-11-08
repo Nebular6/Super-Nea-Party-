@@ -7,26 +7,39 @@ Screen_size = pygame.display.get_window_size()
 clock = pygame.time.Clock()
 main_loop = True
 current_selected_game = 2
+current_frame = 0
+
 
 def slots():
+    global current_frame
+    current_frame += 1
     pygame.display.quit()
-    print("hai")
     slot_machine = pygame.image.load("Assets/SlotMachine.png")
+ 
     new_screen_width = slot_machine.get_width()
+ 
     new_screen_height = slot_machine.get_height() 
+
     screen_slots = pygame.display.set_mode((new_screen_width, new_screen_height))
+
     screen_slots.blit(slot_machine)
+
     symbol_list = ["Seven.png","Melon.png","Diamond.png"]
+
     symbols = []
-    keys = pygame.key.get_pressed()
-    if keys[pygame.K_e] == True:
+    while True:
+        clock.tick(1) 
+        current_frame += 1
+        keys = pygame.event.get()
+        print(current_frame)
+        pygame.display.flip()
         for i in range(3):
             symbols.append(pygame.image.load("Assets/Slot Symbols/" + symbol_list[random.randint(0,2)]))
-    x_pos_slot_symbols = 220
-    for item in symbols:
-        screen_slots.blit(item,(x_pos_slot_symbols,250))
-        x_pos_slot_symbols += 62.5
-    pygame.display.flip()
+        x_pos_slot_symbols = 220
+        for item in symbols:  
+            screen_slots.blit(item,(x_pos_slot_symbols,250))
+            x_pos_slot_symbols += 62.5
+
 
 
 def game_current(game_current):
@@ -37,6 +50,7 @@ def game_current(game_current):
     
 
 while main_loop:
+    current_frame += 1
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             main_loop = False
@@ -45,6 +59,7 @@ while main_loop:
     if keys[pygame.K_SPACE] == True: #general way to get a keyto have an effect
         current_selected_game = random.randint(1,2) #selects a random integer correlating to one of the games 
     game_current(current_selected_game)
+    #game_current(1)
 
 
     pygame.display.flip() #updates the screen
