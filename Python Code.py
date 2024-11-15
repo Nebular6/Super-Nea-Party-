@@ -12,6 +12,7 @@ current_frame = 0
 def quitting_script():
         for event in pygame.event.get():
            if event.type == pygame.QUIT:
+                pygame.display.quit()
                 return False
         return True
 
@@ -34,12 +35,15 @@ def check_if_win(screen_slots,new_screen_height,new_screen_width,symbols):
 
 
 def draw_symbols(symbol_list,symbols,screen_slots,x_pos_slot_symbols):
+    symboll_list_usable = []
     for i in range(3):
-        symbols.append(pygame.image.load("Assets/Slot Symbols/" + symbol_list[random.randint(0,2)]))
+        used_symbol = symbol_list[random.randint(0,2)]
+        symbols.append(pygame.image.load("Assets/Slot Symbols/" + used_symbol))
+        symboll_list_usable.append(used_symbol)
     for item in symbols:  
         screen_slots.blit(item,(x_pos_slot_symbols,250))
         x_pos_slot_symbols += 62.5
-
+    return symboll_list_usable
 
 
 def slots():
@@ -52,14 +56,17 @@ def slots():
     screen_slots = pygame.display.set_mode((new_screen_width, new_screen_height))
     symbol_list = ["Seven.png","Melon.png","Diamond.png"]
     gambling = True
-    while gambling:
-        symbols = []
-        x_pos_slot_symbols = 220
-        pygame.display.flip()
-        screen_slots.blit(slot_machine)
-        draw_symbols(symbol_list,symbols,screen_slots,x_pos_slot_symbols)
-        gambling = check_if_win(screen_slots,new_screen_height, new_screen_width,symbols)
-        gambling = quitting_script()
+    won = True
+    while gambling and won:
+        keys = pygame.key.get_just_pressed()
+        if  keys[pygame.K_SPACE] == True:
+            symbols = []
+            x_pos_slot_symbols = 220
+            pygame.display.flip()
+            screen_slots.blit(slot_machine)
+            win_condition = draw_symbols(symbol_list,symbols,screen_slots,x_pos_slot_symbols)
+            won = check_if_win(screen_slots,new_screen_height, new_screen_width,win_condition)
+            gambling = quitting_script()
 
         
 
