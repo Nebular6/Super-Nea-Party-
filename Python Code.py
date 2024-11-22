@@ -1,12 +1,11 @@
 import pygame
 import random
 pygame.init()
-screen = pygame.display.set_mode()
-pygame.display.set_caption("Super Nea Party")
-Screen_size = pygame.display.get_window_size()
 clock = pygame.time.Clock()
 main_loop = True
 current_frame = 0
+
+
 
 
 def quitting_script():
@@ -16,14 +15,17 @@ def quitting_script():
                 return False
         return True
 
-def centering(image_path, desired_x, desired_y):
-    currentimage = pygame.image.load(image_path)
-    currentimageheight, currentimagewidth = currentimage.height, currentimage.width
-    # works out current image dimensions
-    actual_x = desired_x - currentimagewidth/2
-    actual_y = desired_y - currentimageheight/2  
-    return actual_x, actual_y
 
+def set_setbackground_image(rel_path):
+    pygame.display.quit()
+    screen = pygame.display.set_mode()
+    pygame.display.set_caption("Super Nea Party")
+    backing_image = pygame.image.load(rel_path)
+    screen_width, screen_height = backing_image.get_width(), backing_image.get_height()
+    screen = pygame.display.set_mode((screen_width, screen_height))
+    screen.blit(backing_image)
+    util = [screen, backing_image]
+    return util
 
 
 def check_if_win(screen_slots,new_screen_height,new_screen_width,symbols):
@@ -73,8 +75,9 @@ def slots():
     pygame.display.quit()
     winner_screen = pygame.image.load("Assets\Slot Symbols\Winner!.jpg")
     winner_screen_width, winner_screen_height = winner_screen.get_width(), winner_screen.get_height()
-    winner_screen = pygame.display.set_mode((winner_screen_width,winner_screen_height))
-    pygame.display.update()
+    winner_screen_display = pygame.display.set_mode((winner_screen_width,winner_screen_height))
+    winner_screen_display.blit(winner_screen)
+    pygame.display.flip()
     waiting_for_input = True
     while waiting_for_input:
         if events[pygame.K_SPACE]:
@@ -90,6 +93,8 @@ def game_current(game_current):
         pass
     
 
+display = set_setbackground_image("Assets/Untitled.png")
+display[0].blit(display[1])
 while main_loop:
     current_frame += 1
     main_loop = quitting_script()
@@ -97,7 +102,6 @@ while main_loop:
     if keys[pygame.K_SPACE] == True: #general way to get a keyto have an effect
         current_selected_game = random.randint(1,2) #selects a random integer correlating to one of the games 
         playerwin = game_current(current_selected_game)
-
     pygame.display.flip() #updates the screen
     clock.tick(60)        #sets the framerate 
 
