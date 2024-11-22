@@ -28,7 +28,6 @@ def centering(image_path, desired_x, desired_y):
 
 def check_if_win(screen_slots,new_screen_height,new_screen_width,symbols):
     if symbols[0] == symbols[1] == symbols[2]:
-        screen_slots.blit(pygame.image.load("Assets\Slot Symbols\Winner!.jpg"),(0,0))
         return False
     else:
         return True
@@ -57,22 +56,36 @@ def slots():
     symbol_list = ["Seven.png","Melon.png","Diamond.png"]
     gambling = True
     won = True
+    player = 0
     while gambling and won:
-        keys = pygame.key.get_just_pressed()
-        if  keys[pygame.K_SPACE] == True:
-            symbols = []
-            x_pos_slot_symbols = 220
-            pygame.display.flip()
-            screen_slots.blit(slot_machine)
-            win_condition = draw_symbols(symbol_list,symbols,screen_slots,x_pos_slot_symbols)
-            won = check_if_win(screen_slots,new_screen_height, new_screen_width,win_condition)
+            current_frame += 1
+            events = pygame.key.get_just_pressed()
             gambling = quitting_script()
-
+            pygame.display.flip()
+            if events[pygame.K_h]:
+                player += 1
+                symbols = []
+                x_pos_slot_symbols = 220
+                pygame.display.flip()
+                screen_slots.blit(slot_machine)
+                win_condition = draw_symbols(symbol_list,symbols,screen_slots,x_pos_slot_symbols)
+                won = check_if_win(screen_slots,new_screen_height, new_screen_width,win_condition)
+    pygame.display.quit()
+    winner_screen = pygame.image.load("Assets\Slot Symbols\Winner!.jpg")
+    winner_screen_width, winner_screen_height = winner_screen.get_width(), winner_screen.get_height()
+    winner_screen = pygame.display.set_mode((winner_screen_width,winner_screen_height))
+    pygame.display.update()
+    waiting_for_input = True
+    while waiting_for_input:
+        if events[pygame.K_SPACE]:
+            return player
+        
+    
         
 
 def game_current(game_current):
     if game_current == 1:
-        slots()
+        return slots()
     if game_current == 2:
         pass
     
@@ -83,11 +96,8 @@ while main_loop:
     keys = pygame.key.get_pressed()
     if keys[pygame.K_SPACE] == True: #general way to get a keyto have an effect
         current_selected_game = random.randint(1,2) #selects a random integer correlating to one of the games 
-        game_current(current_selected_game)
-    #game_current(1)
-
+        playerwin = game_current(current_selected_game)
 
     pygame.display.flip() #updates the screen
     clock.tick(60)        #sets the framerate 
-
 
