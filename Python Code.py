@@ -1,4 +1,5 @@
 import pygame
+import time
 import random
 pygame.init()
 clock = pygame.time.Clock()
@@ -72,6 +73,8 @@ def slots():
                 screen_slots.blit(slot_machine)
                 win_condition = draw_symbols(symbol_list,symbols,screen_slots,x_pos_slot_symbols)
                 won = check_if_win(screen_slots,new_screen_height, new_screen_width,win_condition)
+    pygame.display.flip()
+    time.sleep(1)
     pygame.display.quit()
     winner_screen = pygame.image.load("Assets\Slot Symbols\Winner!.jpg")
     winner_screen_width, winner_screen_height = winner_screen.get_width(), winner_screen.get_height()
@@ -84,7 +87,30 @@ def slots():
             return player
         
     
-        
+def asteroid_shooter():
+    pass
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 def game_current(game_current):
     if game_current == 1:
