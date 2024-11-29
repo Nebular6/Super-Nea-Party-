@@ -76,19 +76,81 @@ def slots():
     pygame.display.flip()
     time.sleep(1)
     pygame.display.quit()
-    winner_screen = pygame.image.load("Assets\Slot Symbols\Winner!.jpg")
+    winner_screen = pygame.image.load("Assets/Slot Symbols/Winner!.jpg")
     winner_screen_width, winner_screen_height = winner_screen.get_width(), winner_screen.get_height()
     winner_screen_display = pygame.display.set_mode((winner_screen_width,winner_screen_height))
     winner_screen_display.blit(winner_screen)
+    print(type(winner_screen_display))
     pygame.display.flip()
-    waiting_for_input = True
-    while waiting_for_input:
-        if events[pygame.K_SPACE]:
-            return player
+    time.sleep(3)
+    return player
+
+
+
+        
+
+
+        
+
+def asteroid_shooter():
+    class Sprite():
+        def __init__(self, imagefilepath):
+            image = self.pygame.image.load(imagefilepath)
+            speed = 0
+            xposition = 0
+            yposition = 0
+    class Ship(Sprite):
+        def __init__(self, imagefilepath):
+            super().__init__(imagefilepath)
+            currentAngle = 0
+            def shoot(currentAngle):
+                pass
+            def gameover():
+                pass
+    class Projectile(Sprite):
+        def __init__(self, imagefilepath):
+            super().__init__(imagefilepath)
         
     
-def asteroid_shooter():
-    pass
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    """class Asteriod:
+        def __init__(self,health,screen_position,speed):
+            # easy way to get an asteroid at atleast 1 maximum and randomised position so anywhere on outside of screen
+            if random.randint(1,2) == 2:
+                if random.randint(1,2) == 2:
+                    self.screen_position = (screen.get_width(),random.randint(0,screen.get_height()))
+                else:
+                    self.screen_position = (0,random.randint(0,screen.get_height()))
+            else:
+                if random.randint(1,2) == 2:
+                    self.screen_position = (random.randint(0,screen.get_width()),screen.get_height)
+                else:
+                    self.screen_position = (random.randint(0,screen.get_width()),0)
+
+
+
+"""
+
+    pygame.display.quit()
+    screen = pygame.display.set_mode()
+
+    
+
+
 
 
 
@@ -113,10 +175,11 @@ def asteroid_shooter():
 
 
 def game_current(game_current):
+
     if game_current == 1:
         return slots()
     if game_current == 2:
-        pass
+        return asteroid_shooter()
     
 
 display = set_setbackground_image("Assets/Untitled.png")
@@ -130,4 +193,3 @@ while main_loop:
         playerwin = game_current(current_selected_game)
     pygame.display.flip() #updates the screen
     clock.tick(60)        #sets the framerate 
-
