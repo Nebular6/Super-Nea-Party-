@@ -6,9 +6,6 @@ clock = pygame.time.Clock()
 main_loop = True
 current_frame = 0
 
-
-
-
 def quitting_script():
         for event in pygame.event.get():
            if event.type == pygame.QUIT:
@@ -87,66 +84,79 @@ def slots():
 
 
 
-        
+    
 
+class Sprite():
+    def __init__(self, imagefilepath, position,screen):
+        self.image = pygame.image.load(imagefilepath)
+        self.position = position
+        self.screen = screen
+    def blit(self):
+        self.screen.blit(self.image,self.position)
+    def updatePosition():
+        pass
+class Ship(Sprite):
+    def __init__(self, imagefilepath, position, screen):
+        super().__init__(imagefilepath, position, screen)
+        self.currentAngle = 0
+    def shoot():
+        pass
+    def gameover():
+        pass
 
-        
+class Projectile(Sprite):
+    def __init__(self, imagefilepath, position, screen):
+        super().__init__(imagefilepath, position, screen)
+        self.speed_x = 10
+        self.speed_y = 10
 
-def asteroid_shooter():
-    class Sprite():
-        def __init__(self, imagefilepath):
-            image = self.pygame.image.load(imagefilepath)
-            speed = 0
-            xposition = 0
-            yposition = 0
-    class Ship(Sprite):
-        def __init__(self, imagefilepath):
-            super().__init__(imagefilepath)
-            currentAngle = 0
-            def shoot(currentAngle):
-                pass
-            def gameover():
-                pass
-    class Projectile(Sprite):
-        def __init__(self, imagefilepath):
-            super().__init__(imagefilepath)
+class Asteroid(Projectile):
+    def __init__(self, imagefilepath,screen):
         
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    """class Asteriod:
-        def __init__(self,health,screen_position,speed):
-            # easy way to get an asteroid at atleast 1 maximum and randomised position so anywhere on outside of screen
+        # easy way to get an asteroid at atleast 1 maximum and randomised position so anywhere on outside of screen
+        if random.randint(1,2) == 2:
             if random.randint(1,2) == 2:
-                if random.randint(1,2) == 2:
-                    self.screen_position = (screen.get_width(),random.randint(0,screen.get_height()))
-                else:
-                    self.screen_position = (0,random.randint(0,screen.get_height()))
+                self.position = (screen.get_width(),random.randint(0,screen.get_height()))
             else:
-                if random.randint(1,2) == 2:
-                    self.screen_position = (random.randint(0,screen.get_width()),screen.get_height)
-                else:
-                    self.screen_position = (random.randint(0,screen.get_width()),0)
-
-
-
-"""
-
+                self.position = (0,random.randint(0,screen.get_height()))
+        else:
+            if random.randint(1,2) == 2:
+                self.position = (random.randint(0,screen.get_width()),screen.get_height())
+            else:
+                self.position = (random.randint(0,screen.get_width()),0)
+        super().__init__(imagefilepath, self.position ,screen)
+        self.speed = 1 #random.randint(250,500)
+    
+    def towardsCenter(self,screen):
+        try:
+            self.x_difference = screen.get_height() / 2 - self.position[0]
+            self.y_difference = screen.get_width() / 2 - self.position[1]
+            self.x_difference = self.x_difference/min(self.y_difference,self.x_difference)
+            self.y_difference = self.y_difference/min(self.y_difference,self.x_difference)
+            ratiomultiplier = self.speed/(self.x_difference+self.y_difference)
+            self.x_difference = self.x_difference * ratiomultiplier
+            self.y_difference = self.y_difference * ratiomultiplier
+            self.position = (int(round(self.position[0]+self.x_difference)), int(round(self.position[1]+self.y_difference)))
+        except:
+            print("1")
+    
+def asteroid_shooter():
     pygame.display.quit()
     screen = pygame.display.set_mode()
+    asteriouds = []
+    while True:
+        if random.randint(1,50) == 50:
+            asteriouds.append(Asteroid("Assets/Asteroid/Asterod.png",screen,))
+        quitting_script()
+        for ass in asteriouds:
+            ass.towardsCenter(screen)
+            screen.blit(screen)
+            ass.blit()
+            
+        pygame.display.flip()
+
+
+    
 
     
 
@@ -175,7 +185,7 @@ def asteroid_shooter():
 
 
 def game_current(game_current):
-
+    game_current = 2
     if game_current == 1:
         return slots()
     if game_current == 2:
