@@ -86,6 +86,8 @@ def slots():
 
     
 
+
+
 class Sprite():
     def __init__(self, imagefilepath, position,screen):
         self.image = pygame.image.load(imagefilepath)
@@ -96,9 +98,10 @@ class Sprite():
     def updatePosition():
         pass
 class Ship(Sprite):
-    def __init__(self, imagefilepath, position, screen):
-        super().__init__(imagefilepath, position, screen)
+    def __init__(self, imagefilepath, screen):
+        super().__init__(imagefilepath, screen)
         self.currentAngle = 0
+        self.position = (screen.get_width()/2-self.image.get_width()/2,screen.get_height()/2-self.image.getwidth())
     def shoot():
         pass
     def gameover():
@@ -120,39 +123,42 @@ class Asteroid(Projectile):
             else:
                 self.position = (0,random.randint(0,screen.get_height()))
         else:
-            if random.randint(1,2) == 2:
+            if random.randint(1,2) == 1:
                 self.position = (random.randint(0,screen.get_width()),screen.get_height())
             else:
                 self.position = (random.randint(0,screen.get_width()),0)
         super().__init__(imagefilepath, self.position ,screen)
-        self.speed = 1 #random.randint(250,500)
+        self.speed = 5 #random.randint(250,500)
     
-    def towardsCenter(self,screen):
+    def towardsCenter(self,screen,asteroids):
         try:
-            self.x_difference = screen.get_height() / 2 - self.position[0]
-            self.y_difference = screen.get_width() / 2 - self.position[1]
-            self.x_difference = self.x_difference/min(self.y_difference,self.x_difference)
-            self.y_difference = self.y_difference/min(self.y_difference,self.x_difference)
-            ratiomultiplier = self.speed/(self.x_difference+self.y_difference)
-            self.x_difference = self.x_difference * ratiomultiplier
-            self.y_difference = self.y_difference * ratiomultiplier
+            self.x_difference = screen.get_width() / 2 - self.position[0]
+            self.y_difference = screen.get_height() / 2 - self.position[1]
+            ratiomultiplier = (self.x_difference ** 2 + self.y_difference **2 ) **0.5
+            self.x_difference /= ratiomultiplier
+            self.y_difference /= ratiomultiplier
+            self.x_difference *= self.speed
+            self.x_difference *= self.speed
             self.position = (int(round(self.position[0]+self.x_difference)), int(round(self.position[1]+self.y_difference)))
         except:
-            print("1")
+            return asteroids.remove(self)
     
 def asteroid_shooter():
     pygame.display.quit()
     screen = pygame.display.set_mode()
-    asteriouds = []
+    clock.tick(60)
+    asteroids = []
+    ship = Ship("Assets/Asteroid/SpaceShip.png",screen)
+    ship.blit()
     while True:
-        if random.randint(1,50) == 50:
-            asteriouds.append(Asteroid("Assets/Asteroid/Asterod.png",screen,))
+        if random.randint(1,1) == 1:
+            asteroids.append(Asteroid("Assets/Asteroid/Asterod.png",screen))
         quitting_script()
-        for ass in asteriouds:
-            ass.towardsCenter(screen)
-            screen.blit(screen)
+        screen.fill(1)
+        screen.blit(screen)
+        for ass in asteroids:
+            ass.towardsCenter(screen,asteroids)
             ass.blit()
-            
         pygame.display.flip()
 
 
