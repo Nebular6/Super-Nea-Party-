@@ -62,7 +62,7 @@ def slots():
             events = pygame.key.get_just_pressed()
             gambling = quitting_script()
             pygame.display.flip()
-            if events[pygame.K_h]:
+            if events[pygame.K_SPACE]:
                 player += 1
                 symbols = []
                 x_pos_slot_symbols = 220
@@ -97,15 +97,28 @@ class Sprite():
         self.screen.blit(self.image,self.position)
     def updatePosition():
         pass
+    
 class Ship(Sprite):
     def __init__(self, imagefilepath, screen):
-        super().__init__(imagefilepath, screen)
+        position = 0
+        super().__init__(imagefilepath, position ,screen)
         self.currentAngle = 0
-        self.position = (screen.get_width()/2-self.image.get_width()/2,screen.get_height()/2-self.image.getwidth())
-    def shoot():
-        pass
-    def gameover():
-        pass
+        self.position = (screen.get_width()/2-self.image.get_width()/2,screen.get_height()/2-self.image.get_width())
+        self.rotatedimage = self.image
+    def position(self):
+        return self.position
+    def ship_direction(self,events):
+        rotate_angle = 0
+        for input in events:
+            if input.type == pygame.KEYDOWN:
+                if input.key == pygame.K_d or pygame.K_a:
+                    if input.key == pygame.K_a:
+                        rotate_angle = self.currentAngle-2
+                    elif input.key == pygame.K_d:
+                        rotate_angle = self.currentAngle+2
+                self.currentAngle =+ rotate_angle
+                self.rotatedimage = pygame.transform.rotate(self.image,self.currentAngle)
+
 
 class Projectile(Sprite):
     def __init__(self, imagefilepath, position, screen):
@@ -141,21 +154,25 @@ class Asteroid(Projectile):
             self.x_difference *= self.speed
             self.position = (int(round(self.position[0]+self.x_difference)), int(round(self.position[1]+self.y_difference)))
         except:
-            return asteroids.remove(self)
+            return asteroids.remove(self) # gameover
     
 def asteroid_shooter():
     pygame.display.quit()
     screen = pygame.display.set_mode()
     clock.tick(60)
     asteroids = []
-    ship = Ship("Assets/Asteroid/SpaceShip.png",screen)
+    ship = Ship("Assets\Asteroid\SpaceShip.png", screen)
+    ship.image = pygame.transform.scale(ship.image,(100,100))
     ship.blit()
     while True:
-        if random.randint(1,1) == 1:
-            asteroids.append(Asteroid("Assets/Asteroid/Asterod.png",screen))
+        inputs = pygame.event.get()
+        if random.randint(1,1000) == 1:
+            asteroids.append(Asteroid("Assets\Asteroid\Asterod.png",screen))    
         quitting_script()
         screen.fill(1)
         screen.blit(screen)
+        ship.ship_direction(inputs)
+        screen.blit(ship.rotatedimage,(ship.position))
         for ass in asteroids:
             ass.towardsCenter(screen,asteroids)
             ass.blit()
