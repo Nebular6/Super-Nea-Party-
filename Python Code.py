@@ -1,5 +1,6 @@
 import pygame
 import time
+import math
 import random
 pygame.init()
 clock = pygame.time.Clock()
@@ -84,10 +85,6 @@ def slots():
 
 
 
-    
-
-
-
 class Sprite():
     def __init__(self, imagefilepath, position,screen):
         self.image = pygame.image.load(imagefilepath)
@@ -102,29 +99,48 @@ class Ship(Sprite):
     def __init__(self, imagefilepath, screen):
         position = 0
         super().__init__(imagefilepath, position ,screen)
-        self.currentAngle = 0
+        self.current_angle = 0
         self.position = (screen.get_width()/2-self.image.get_width()/2,screen.get_height()/2-self.image.get_width())
         self.rotatedimage = self.image
+        self.time_of_movement = time.time()
+        self.timeofshoot = time.time()
+
     def position(self):
         return self.position
-    def ship_direction(self,events):
-        rotate_angle = 0
-        for input in events:
-            if input.type == pygame.KEYDOWN:
-                if input.key == pygame.K_d or pygame.K_a:
-                    if input.key == pygame.K_a:
-                        rotate_angle = self.currentAngle-2
-                    elif input.key == pygame.K_d:
-                        rotate_angle = self.currentAngle+2
-                self.currentAngle =+ rotate_angle
-                self.rotatedimage = pygame.transform.rotate(self.image,self.currentAngle)
+    def current_angle(self):
+        return self.current_angle
+
+    def ship_direction(self,keys):
+        req = self.time_of_movement - time.time()
+        if req > -0.01:
+            return
+        else:
+            rotate_angle = self.current_angle
+            if keys[pygame.K_a]:
+                rotate_angle = self.current_angle - 3
+            if keys[pygame.K_d]:
+                rotate_angle = self.current_angle + 3
+            self.current_angle = self.current_angle % 360
+            self.current_angle = rotate_angle
+            self.rotatedimage = pygame.transform.rotate(self.image,self.current_angle)
+            self.time_of_movement = time.time()
+
+    def Shoot(self,screen):
+        return Projectile("Assets/Asteroid/bullet.png",(0,0),screen,self)
 
 
 class Projectile(Sprite):
-    def __init__(self, imagefilepath, position, screen):
+    def __init__(self, imagefilepath, position, screen, ship):
         super().__init__(imagefilepath, position, screen)
-        self.speed_x = 10
-        self.speed_y = 10
+        self.position = (screen.get_width()/2-self.image.get_width()/2,screen.get_height()/2-self.image.get_width())
+        self.ship = ship
+        self.angleoftravel = self.ship.current_angle
+        self.xmove = 10 * math.cos(self.angleoftravel)
+        self.ymove = 10 * math.sin(self.angleoftravel)
+
+    def updatepos(self):
+        self.position = self.position[0]+self.xmove,self.position[1]+self.ymove
+        self.blit()
 
 class Asteroid(Projectile):
     def __init__(self, imagefilepath,screen):
@@ -141,7 +157,7 @@ class Asteroid(Projectile):
             else:
                 self.position = (random.randint(0,screen.get_width()),0)
         super().__init__(imagefilepath, self.position ,screen)
-        self.speed = 5 #random.randint(250,500)
+        self.speed = random.randint(1,5)  #random.randint(250,500)
     
     def towardsCenter(self,screen,asteroids):
         try:
@@ -161,17 +177,22 @@ def asteroid_shooter():
     screen = pygame.display.set_mode()
     clock.tick(60)
     asteroids = []
+    bullets = []
     ship = Ship("Assets\Asteroid\SpaceShip.png", screen)
     ship.image = pygame.transform.scale(ship.image,(100,100))
     ship.blit()
     while True:
-        inputs = pygame.event.get()
-        if random.randint(1,1000) == 1:
+        keys = pygame.key.get_pressed()
+        if random.randint(1,10000000000) == 1:
             asteroids.append(Asteroid("Assets\Asteroid\Asterod.png",screen))    
         quitting_script()
         screen.fill(1)
         screen.blit(screen)
-        ship.ship_direction(inputs)
+        ship.ship_direction(keys)
+        bullets.append(ship.Shoot(screen))
+        for item in bullets:
+            Projectile.updatepos(item)
+
         screen.blit(ship.rotatedimage,(ship.position))
         for ass in asteroids:
             ass.towardsCenter(screen,asteroids)
