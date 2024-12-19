@@ -197,7 +197,7 @@ def asteroid_shooter():
         for ass in asteroids:
             ass.towardsCenter(screen,asteroids)
             ass.blit()
-        pygame.display.flip()
+        pygame.display.flip() # comit
 
 
     
