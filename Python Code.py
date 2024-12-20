@@ -14,7 +14,6 @@ def quitting_script():
                 return False
         return True
 
-
 def set_setbackground_image(rel_path):
     pygame.display.quit()
     screen = pygame.display.set_mode()
@@ -26,13 +25,11 @@ def set_setbackground_image(rel_path):
     util = [screen, backing_image]
     return util
 
-
 def check_if_win(screen_slots,new_screen_height,new_screen_width,symbols):
     if symbols[0] == symbols[1] == symbols[2]:
         return False
     else:
         return True
-
 
 def draw_symbols(symbol_list,symbols,screen_slots,x_pos_slot_symbols):
     symboll_list_usable = []
@@ -90,10 +87,9 @@ class Sprite():
         self.image = pygame.image.load(imagefilepath)
         self.position = position
         self.screen = screen
-    def blit(self):
+
+    def updateimage(self):
         self.screen.blit(self.image,self.position)
-    def updatePosition():
-        pass
     
 class Ship(Sprite):
     def __init__(self, imagefilepath, screen):
@@ -117,9 +113,9 @@ class Ship(Sprite):
         else:
             rotate_angle = self.current_angle
             if keys[pygame.K_a]:
-                rotate_angle = self.current_angle - 3
-            if keys[pygame.K_d]:
                 rotate_angle = self.current_angle + 3
+            if keys[pygame.K_d]:
+                rotate_angle = self.current_angle - 3
             self.current_angle = self.current_angle % 360
             self.current_angle = rotate_angle
             self.rotatedimage = pygame.transform.rotate(self.image,self.current_angle)
@@ -134,15 +130,21 @@ class Projectile(Sprite):
         super().__init__(imagefilepath, position, screen)
         self.position = (screen.get_width()/2-self.image.get_width()/2,screen.get_height()/2-self.image.get_width())
         self.ship = ship
-        self.angleoftravel = self.ship.current_angle
-        self.xmove = 10 * math.cos(self.angleoftravel)
-        self.ymove = 10 * math.sin(self.angleoftravel)
+        self.angleoftravel = self.ship.current_angle + 90
+        self.xmove = 10 * math.cos((-self.angleoftravel * (0.01745329)))  
+        self.ymove = 10 * math.sin((-self.angleoftravel * (0.01745329)))  
 
     def updatepos(self):
         self.position = self.position[0]+self.xmove,self.position[1]+self.ymove
-        self.blit()
+        self.updateimage()
 
-class Asteroid(Projectile):
+    def checkcolision(self,ass):
+        if self.checkcolision(ass):
+            Projectile.remove(self)
+            Asteroid.remove(ass)
+
+
+class Asteroid(Sprite):
     def __init__(self, imagefilepath,screen):
         
         # easy way to get an asteroid at atleast 1 maximum and randomised position so anywhere on outside of screen
@@ -156,7 +158,7 @@ class Asteroid(Projectile):
                 self.position = (random.randint(0,screen.get_width()),screen.get_height())
             else:
                 self.position = (random.randint(0,screen.get_width()),0)
-        super().__init__(imagefilepath, self.position ,screen)
+        super().__init__(imagefilepath,self.position,screen)
         self.speed = random.randint(1,5)  #random.randint(250,500)
     
     def towardsCenter(self,screen,asteroids):
@@ -180,10 +182,10 @@ def asteroid_shooter():
     bullets = []
     ship = Ship("Assets\Asteroid\SpaceShip.png", screen)
     ship.image = pygame.transform.scale(ship.image,(100,100))
-    ship.blit()
+    ship.updateimage()
     while True:
         keys = pygame.key.get_pressed()
-        if random.randint(1,10000000000) == 1:
+        if random.randint(1,100) == 1:
             asteroids.append(Asteroid("Assets\Asteroid\Asterod.png",screen))    
         quitting_script()
         screen.fill(1)
@@ -192,40 +194,12 @@ def asteroid_shooter():
         bullets.append(ship.Shoot(screen))
         for item in bullets:
             Projectile.updatepos(item)
-
         screen.blit(ship.rotatedimage,(ship.position))
         for ass in asteroids:
             ass.towardsCenter(screen,asteroids)
-            ass.blit()
-        pygame.display.flip() # comit
-
-
-    
-
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+            ass.updateimage()
+            Projectile.checkcolision(ass)
+        pygame.display.flip()
 
 
 def game_current(game_current):
