@@ -1,8 +1,10 @@
 import pygame
 import time
+import sched
 import math
 import random
 pygame.init()
+pygame.mixer.init()
 clock = pygame.time.Clock()
 main_loop = True
 current_frame = 0
@@ -81,7 +83,6 @@ def slots():
     return player
 
 
-
 class Sprite():
     def __init__(self, imagefilepath, position,screen):
         self.image = pygame.image.load(imagefilepath)
@@ -90,7 +91,11 @@ class Sprite():
 
     def updateimage(self):
         self.screen.blit(self.image,self.position)
+
+    def checkcollision(self,ass):
+        pass
     
+
 class Ship(Sprite):
     def __init__(self, imagefilepath, screen):
         position = 0
@@ -102,6 +107,7 @@ class Ship(Sprite):
         self.timeofshoot = time.time()
 
     def position(self):
+
         return self.position
     def current_angle(self):
         return self.current_angle
@@ -113,22 +119,25 @@ class Ship(Sprite):
         else:
             rotate_angle = self.current_angle
             if keys[pygame.K_a]:
-                rotate_angle = self.current_angle + 3
+                rotate_angle = self.current_angle + 5
             if keys[pygame.K_d]:
-                rotate_angle = self.current_angle - 3
+
+                rotate_angle = self.current_angle - 5
             self.current_angle = self.current_angle % 360
             self.current_angle = rotate_angle
             self.rotatedimage = pygame.transform.rotate(self.image,self.current_angle)
             self.time_of_movement = time.time()
 
     def Shoot(self,screen):
+        pygame.mixer.music.load("Assets\Sounds\laser-shot-ingame-230500.mp3")
+        pygame.mixer.music.play()
         return Projectile("Assets/Asteroid/bullet.png",(0,0),screen,self)
 
 
 class Projectile(Sprite):
     def __init__(self, imagefilepath, position, screen, ship):
         super().__init__(imagefilepath, position, screen)
-        self.position = (screen.get_width()/2-self.image.get_width()/2,screen.get_height()/2-self.image.get_width())
+        self.position = (screen.get_width()/2-self.image.get_width()+50/2,screen.get_height()/2-self.image.get_width()+50)
         self.ship = ship
         self.angleoftravel = self.ship.current_angle + 90
         self.xmove = 10 * math.cos((-self.angleoftravel * (0.01745329)))  
@@ -137,11 +146,6 @@ class Projectile(Sprite):
     def updatepos(self):
         self.position = self.position[0]+self.xmove,self.position[1]+self.ymove
         self.updateimage()
-
-    def checkcolision(self,ass):
-        if self.checkcolision(ass):
-            Projectile.remove(self)
-            Asteroid.remove(ass)
 
 
 class Asteroid(Sprite):
@@ -172,8 +176,18 @@ class Asteroid(Sprite):
             self.x_difference *= self.speed
             self.position = (int(round(self.position[0]+self.x_difference)), int(round(self.position[1]+self.y_difference)))
         except:
+            print("brain please ")
             return asteroids.remove(self) # gameover
-    
+            
+
+    def checkcollision(self, bullet,asteroids):
+        if self.position[0] < bullet.position[0] < self.position[0] + self.image.get_width():
+            if self.position[1] < bullet.position[1]<self.position[1] + self.image.get_height():
+                asteroids.remove(self)
+            pass
+        pass    
+
+
 def asteroid_shooter():
     pygame.display.quit()
     screen = pygame.display.set_mode()
@@ -181,25 +195,41 @@ def asteroid_shooter():
     asteroids = []
     bullets = []
     ship = Ship("Assets\Asteroid\SpaceShip.png", screen)
+    framecountlocal = 0
     ship.image = pygame.transform.scale(ship.image,(100,100))
     ship.updateimage()
     while True:
         keys = pygame.key.get_pressed()
-        if random.randint(1,100) == 1:
+        if random.randint(1,200) == 100:
             asteroids.append(Asteroid("Assets\Asteroid\Asterod.png",screen))    
         quitting_script()
         screen.fill(1)
         screen.blit(screen)
         ship.ship_direction(keys)
-        bullets.append(ship.Shoot(screen))
+        framecountlocal += 1
+        if  framecountlocal % 20 == 1:
+            bullets.append(ship.Shoot(screen))
         for item in bullets:
             Projectile.updatepos(item)
         screen.blit(ship.rotatedimage,(ship.position))
         for ass in asteroids:
             ass.towardsCenter(screen,asteroids)
             ass.updateimage()
-            Projectile.checkcolision(ass)
+            for item in bullets:
+                ass.checkcollision(item,asteroids)
         pygame.display.flip()
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 def game_current(game_current):
@@ -209,7 +239,6 @@ def game_current(game_current):
     if game_current == 2:
         return asteroid_shooter()
     
-
 display = set_setbackground_image("Assets/Untitled.png")
 display[0].blit(display[1])
 while main_loop:
